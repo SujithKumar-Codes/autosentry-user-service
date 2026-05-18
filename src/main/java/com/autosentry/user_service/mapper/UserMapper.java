@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserMapper {
 
-    // maps user entity
+    // maps user entity (hiding the password)
     public UserProfileDTO toDTO(User user) {
         if (user == null) {
             return null;

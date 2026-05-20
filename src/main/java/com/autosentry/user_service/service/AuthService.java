@@ -50,7 +50,7 @@ public class AuthService {
         preferenceRepository.save(prefs);
 
         // Generate 24-Hour Token
-        String token = jwtUtil.generateToken(savedUser.getEmail());
+        String token = jwtUtil.generateToken(savedUser.getId(), savedUser.getEmail());
 
         // Return the payload to the Controller
         return new AuthResponseDTO(token, savedUser.getId(), savedUser.getName());
@@ -69,7 +69,7 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // Generate a fresh 24-Hour Token
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user.getId(), user.getEmail());
 
         // Return the payload
         return new AuthResponseDTO(token, user.getId(), user.getName());

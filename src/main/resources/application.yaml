@@ -3,15 +3,18 @@ server:
 
 spring:
   application:
-    name: USER-SERVICE // Caps for Eureka matching
+    name: USER-SERVICE
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/user_db
-    username: postgres
-    password: your_password
+    url: jdbc:postgresql://localhost:5433/user_db
+    username: admin
+    password: password123
+
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
 eureka:
   client:

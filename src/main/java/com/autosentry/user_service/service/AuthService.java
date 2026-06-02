@@ -5,6 +5,8 @@ import com.autosentry.user_service.dto.LoginRequestDTO;
 import com.autosentry.user_service.dto.RegisterRequestDTO;
 import com.autosentry.user_service.entity.NotificationPreference;
 import com.autosentry.user_service.entity.User;
+import com.autosentry.user_service.exception.EmailAlreadyInUseException;
+import com.autosentry.user_service.exception.ResourceNotFoundException;
 import com.autosentry.user_service.repository.NotificationPreferenceRepository;
 import com.autosentry.user_service.repository.UserRepository;
 import com.autosentry.user_service.security.JwtUtil;
@@ -30,7 +32,7 @@ public class AuthService {
     public AuthResponseDTO register(RegisterRequestDTO request) {
         // Duplicate Email Check
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email is already in use");
+            throw new EmailAlreadyInUseException("Email is already in use: " + request.getEmail());
         }
 
         // Create User, Hash Password, and Save
@@ -66,7 +68,7 @@ public class AuthService {
 
         // Fetch the verified user from the database
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + request.getEmail()));
 
         // Generate a fresh 24-Hour Token
         String token = jwtUtil.generateToken(user.getId(), user.getEmail());

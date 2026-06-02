@@ -4,6 +4,7 @@ import com.autosentry.user_service.dto.NotificationPreferenceDTO;
 import com.autosentry.user_service.dto.UserProfileDTO;
 import com.autosentry.user_service.entity.NotificationPreference;
 import com.autosentry.user_service.entity.User;
+import com.autosentry.user_service.exception.ResourceNotFoundException;
 import com.autosentry.user_service.mapper.NotificationPreferenceMapper;
 import com.autosentry.user_service.mapper.UserMapper;
 import com.autosentry.user_service.repository.NotificationPreferenceRepository;
@@ -24,32 +25,27 @@ public class UserService {
 //    Fetch the user profile(
     public UserProfileDTO getUserProfile(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
         return userMapper.toDTO(user);
     }
 
-//    This is called by services like compliance service
+//    This is called to get the user's notification preferences
     public NotificationPreferenceDTO getNotificationPreferences(Long userId) {
         NotificationPreference prefs = preferenceRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Preferences not found for this user"));
+                .orElseThrow(() -> new ResourceNotFoundException("Notification preferences not found for user id: " + userId));
 
         return preferenceMapper.toDTO(prefs);
     }
 
     @Transactional
     public NotificationPreferenceDTO updateNotificationPreferences(Long userId, NotificationPreferenceDTO request) {
-        //Fetch the existing record from the database
         NotificationPreference existingPrefs = preferenceRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Preferences not found for this user"));
+                .orElseThrow(() -> new ResourceNotFoundException("Notification preferences not found for user id: " + userId));
 
-        // Use mapper to apply the new true/false values to the existing entity
         preferenceMapper.updateEntityFromDTO(request, existingPrefs);
-
-        // Save the updated entity
         NotificationPreference updatedPrefs = preferenceRepository.save(existingPrefs);
 
-        // Return the new preference
         return preferenceMapper.toDTO(updatedPrefs);
     }
 }
